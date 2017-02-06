@@ -13,6 +13,7 @@ params = ["lat",'lon','z']
 z_dic = [156412, 78206, 3910, 19551, 9776, 4888, 2444, 1222, 610.984, 305.492, 152.746, 76.373, 38.187]
 data_2008 = 'users/malariaatlasproject/accessibilityMap/jrc_accesibility2008'
 data_2017 = 'users/malariaatlasproject/accessibilityMap/jrc_accessibility2017'
+band = 'b1';
 
 
 # route for returning click point data
@@ -35,7 +36,6 @@ class ClickPointData(Resource):
 
 # request focused data from EE from params
 def return_ee_stats(location):
-    # get area of point
     distance = z_dic[location['z']]
     d_point = {}
     d_point['lon'] = location['lon']
@@ -44,7 +44,6 @@ def return_ee_stats(location):
     d_point['opt_geodesic'] = False
     point_of_interest = ee.Geometry.Point(**d_point).buffer(distance)
     print("Area of buffered point = {} m^2".format(point_of_interest.area().getInfo()))
-    # image_id = "WORLDCLIM/V1/MONTHLY/01"  # Image data (note I set tavg band below when image is called)
     d = {}
     d['bestEffort'] = True
     d['geometry'] = point_of_interest
@@ -55,7 +54,7 @@ def return_ee_stats(location):
     .combine(ee.Reducer.min(), outputPrefix='',sharedInputs=True) \
     .combine(ee.Reducer.max(), outputPrefix='', sharedInputs=True)
 
-    return ee.Image(data_2008).select('b1').reduceRegion(**d).getInfo()
+    return ee.Image(data_2008).select(band).reduceRegion(**d).getInfo()
 
 
 # set up routes/resources
