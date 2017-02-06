@@ -11,24 +11,22 @@ Python 2.7 app built using Flask, and python-earth-engine-api.
 pip install -r requirements.txt
 ```
 
-2. cd to the folder and run the app
+2. start the app
 
 ```bash
-$cd <path/roadless>
-
 $python main.py
 ```
 
-2. Send a POST request with lat, lon, and z information: e.g.
+2. Send a POST request with lat, lon, and z information: e.g. to /api/click-point-data/
 
 ```
-$ curl -i -H "Content-Type: application/json" -X POST -d '{"lat":28.5, "lon":16.3, "z":3}' http://localhost:5000/foo/api/
+$ curl -i -H "Content-Type: application/json" -X POST -d '{"lat":28.5, "lon":16.3, "z":3}' http://localhost:5000/api/click-point-data/
 ````
 
-Response...
+Example response...
 
 ```
-curl -i -H "Content-Type: application/json" -X POST -d '{"lat":28.5, "lon":16.3, "z":3}' http://localhost:5000/foo/api/
+curl -i -H "Content-Type: application/json" -X POST -d '{"lat":28.5, "lon":16.3, "z":3}' http://localhost:5000/api/click-point-data/
 HTTP/1.0 201 CREATED
 Content-Type: application/json
 Content-Length: 181
