@@ -9,7 +9,7 @@ app = Flask(__name__)
 api = Api(app)
 
 # CONSTS
-params = ["lat",'lon','z']
+params = ['lat','lon','z']
 z_dic = [156412, 78206, 3910, 19551, 9776, 4888, 2444, 1222, 610.984, 305.492, 152.746, 76.373, 38.187]
 data_2008 = 'users/malariaatlasproject/accessibilityMap/jrc_accesibility2008'
 data_2017 = 'users/malariaatlasproject/accessibilityMap/jrc_accessibility2017'
