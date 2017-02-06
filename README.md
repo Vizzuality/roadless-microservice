@@ -8,7 +8,7 @@ Python 2.7 app built using Flask, and python-earth-engine-api.
 1. Install the requirements via pip
 
 ```
-pip install -t requirements.txt
+pip install -r requirements.txt
 ```
 
 2. cd to the folder and run the app
