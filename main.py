@@ -1,15 +1,15 @@
 from __future__ import print_function, division
-import flask
+from flask import Flask, jsonify, request
 from flask_restful import reqparse, abort, Api, Resource
 import ee
 
 # auth earth engine and start flask
 ee.Initialize()
-app = flask.Flask(__name__)
+app = Flask(__name__)
 api = Api(app)
 
 # CONSTS
-params = ['lat','lng','z']
+params = ["lat",'lon','z']
 z_dic = [156412, 78206, 3910, 19551, 9776, 4888, 2444, 1222, 610.984, 305.492, 152.746, 76.373, 38.187]
 data_2008 = 'users/malariaatlasproject/accessibilityMap/jrc_accesibility2008'
 data_2017 = 'users/malariaatlasproject/accessibilityMap/jrc_accessibility2017'
@@ -17,19 +17,20 @@ data_2017 = 'users/malariaatlasproject/accessibilityMap/jrc_accessibility2017'
 
 # route for returning click point data
 def check_request_params(request):
-    print(request)
-    if request == 0:
-        abort(404, message="Todo {} doesn't exist".format(request))
+    if request.has_key(params[0]) and request.has_key(params[1]) and request.has_key(params[2]):
+        print('Valid parmas')
+    else:
+        abort(404, message="Request {} must contain lat, lng, and z.".format(request))
 
 
 # class to handle click request
 class ClickPointData(Resource):
-    def post(location):
-        print(location)
+    def post(self):
+        location = request.get_json(force=True)
         check_request_params(location)
         ee_stats = return_ee_stats(location)
         print("Got {0}".format(ee_stats))
-        return flask.jsonify({'data': ee_stats}), 201
+        return ee_stats
 
 
 # request focused data from EE from params
@@ -37,7 +38,7 @@ def return_ee_stats(location):
     # get area of point
     distance = z_dic[location['z']]
     d_point = {}
-    d_point['lng'] = location['lng']
+    d_point['lon'] = location['lon']
     d_point['lat'] = location['lat']
     d_point['opt_proj'] = 'EPSG:4326'
     d_point['opt_geodesic'] = False
