@@ -1,33 +1,35 @@
-FROM vizzuality/python-gdal:1.0.0
-MAINTAINER Raul <raul.requero@vizzuality.com>
-ARG NAME=python-script
-ENV NAME ${NAME}
+FROM python:2.7-alpine
+MAINTAINER Sergio Gordillo sergio.gordillo@vizzuality.com
 
-RUN apt-get update && apt-get install -y bash git openssl build-essential libffi-dev libxml2-dev libxslt-dev
+ENV NAME flask_app
+ENV USER microservice
 
-RUN groupadd -r $NAME && useradd -r -g $NAME $NAME
+RUN apk update && apk upgrade && \
+   apk add --no-cache --update bash git openssl-dev build-base alpine-sdk \
+   libffi-dev
+
+RUN addgroup $USER && adduser -s /bin/bash -D -G $USER $USER
 
 RUN easy_install pip && pip install --upgrade pip
+RUN pip install virtualenv gunicorn gevent
 
 RUN mkdir -p /opt/$NAME
-RUN cd /opt/$NAME
+RUN cd /opt/$NAME && virtualenv venv && source venv/bin/activate
 COPY requirements.txt /opt/$NAME/requirements.txt
-RUN pip install --upgrade pip
 RUN cd /opt/$NAME && pip install -r requirements.txt
 
 COPY main.py /opt/$NAME/main.py
+COPY entrypoint.sh /opt/$NAME/entrypoint.sh
 
 # Copy the application folder inside the container
 WORKDIR /opt/$NAME
 
-# COPY ./src /opt/$NAME/src
-# COPY ./data /opt/$NAME/data
+RUN chown $USER:$USER /opt/$NAME
+RUN chmod +x /opt/$NAME/entrypoint.sh
 
-RUN chown $NAME:$NAME /opt/$NAME
-USER $NAME
+# Tell Docker we are going to use this port
+EXPOSE 5000
+USER $USER
 
-VOLUME /opt/$NAME/data
-
-# RUN printenv
 # Launch script
-CMD ["python", "main.py"]
+ENTRYPOINT ["./entrypoint.sh"]
