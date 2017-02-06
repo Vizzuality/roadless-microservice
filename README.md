@@ -1,34 +1,78 @@
 # Roadless forests project
-## Function to identify stats around a point
 
-MIT License
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)]()
+
+A Microservice using Flask to identify stats around a point.
+
+
+
+### Docker: starting the Microservice
+To run the Flask microservice
+1. Ensure Docker is installed.
+1. Ensuring the .env file is present containing the EE_PRIVATE_KEY and EE_USER environment variables,
+1. `$chmod +x start.sh`
+1. `$./start.sh`
+
+At this point, the microservice should be active on localhost:8000.
+
+
+### Using the Microservice
+
+ POST request and response:
+
+```bash
+$ curl -i -H "Content-Type: application/json" -X POST -d '{"lat":28.5, "lon":16.3, "z":3}' http://localhost:5000/api/click-point-data/
+
+{
+  "task": {
+    "b1_count": 32,
+    "b1_max": 3606.0,
+    "b1_mean": 3550.03125,
+    "b1_min": 3500.0,
+    "b1_stdDev": 30.397882327556964,
+    "b1_sum": 113601.0
+  }
+}
+```
+
+### Halting the microservice
+If the process is unresponsive obtain the docker ID, and use `docker stop <ID>` to end the process. E.g:
+
+```bash
+$docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS              PORTS                    NAMES
+3ad44399b2be        flask_app           "./entrypoint.sh"   About a minute ago   Up About a minute   0.0.0.0:8000->5000/tcp   kind_elion
+
+$docker stop 3ad44399b2be
+```
+
+### Extended Notes
+
 
 Python 2.7 app built using Flask, and python-earth-engine-api.
 
 1. Install the requirements via pip
 
 ```
-pip install -t requirements.txt
+pip install -r requirements.txt
 ```
 
-2. cd to the folder and run the app
+2. start the app
 
 ```bash
-$cd <path/roadless>
-
 $python main.py
 ```
 
-2. Send a POST request with lat, lon, and z information: e.g.
+2. Send a POST request with lat, lon, and z information: e.g. to /api/click-point-data/
 
 ```
-$ curl -i -H "Content-Type: application/json" -X POST -d '{"lat":28.5, "lon":16.3, "z":3}' http://localhost:5000/foo/api/
+$ curl -i -H "Content-Type: application/json" -X POST -d '{"lat":28.5, "lon":16.3, "z":3}' http://localhost:5000/api/click-point-data/
 ````
 
-Response...
+Example response...
 
 ```
-curl -i -H "Content-Type: application/json" -X POST -d '{"lat":28.5, "lon":16.3, "z":3}' http://localhost:5000/foo/api/
+curl -i -H "Content-Type: application/json" -X POST -d '{"lat":28.5, "lon":16.3, "z":3}' http://localhost:5000/api/click-point-data/
 HTTP/1.0 201 CREATED
 Content-Type: application/json
 Content-Length: 181
@@ -45,19 +89,4 @@ Date: Fri, 03 Feb 2017 13:31:14 GMT
     "tavg_sum": 6616.0
   }
 }
-```
-
-
-Docker info:
-
-buld the image in the local folder via:
-
-```
-docker build -t <desired name> .
-```
-
-Run the container:
-
-```
-docker run -d -p docker_port_number:desired_host_port <desired name>
 ```

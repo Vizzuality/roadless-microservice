@@ -1,2 +1,4 @@
 earthengine-api==0.1.95
 flask==0.12
+flask_restful==0.3.5
+oauth2client==1.5.2
