@@ -9,6 +9,7 @@ app = flask.Flask(__name__)
 api = flask_restful.Api(app)
 
 print("Starting Flask Microservice. Running on ", sys.platform)
+local_system = False
 if sys.platform == 'darwin':
     local_system = True
     # If using a local mac, assume you can initilise using the below...
