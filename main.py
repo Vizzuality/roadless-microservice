@@ -10,6 +10,7 @@ api = flask_restful.Api(app)
 
 print("Starting Flask Microservice. Running on ", sys.platform)
 if sys.platform == 'darwin':
+    local_system = True
     # If using a local mac, assume you can initilise using the below...
     ee.Initialize()
 else:
@@ -33,13 +34,14 @@ class ClickPointData(flask_restful.Resource):
         location = flask.request.get_json(force=True)
         self.check_request_params(location)
         ee_stats = self.return_ee_stats(location)
-        print("Got {0}".format(ee_stats))
+        #print("Got {0}".format(ee_stats))
         return ee_stats
 
     def check_request_params(self, request):
         """route for returning click point data"""
         if request.has_key(self.params[0]) and request.has_key(self.params[1]) and request.has_key(self.params[2]):
-            print('Valid parameters passed')
+            if local_system:
+                print('Valid parameters passed')
         else:
             flask_restful.abort(404, message="Request {} must contain lat, lon, and z.".format(request))
         return
@@ -55,20 +57,26 @@ class ClickPointData(flask_restful.Resource):
         Request aggregated data from two EE images, and place into a single dictionary (response_dict).
         We also control the sig figs of the returned data via a string and format command here.
         """
+        mask_this_image = 'users/malariaatlasproject/accessibilityMap/jrc_accesibility2008'
         response_dict = {}
         d = {'bestEffort': True, 'geometry': self.eePoint(location), 'reducer': ee.Reducer.mean()}
         for image in self.imageIDs:
             image_key = image.split('/')[-1][-4:]
-            print("Requesting EE data for {0}".format(image_key))
+            #print("Requesting EE data for {0}".format(image_key))
             # print("Set buffer distance of ", self.z_dic[location['z']])
             try:
-                response = ee.Image(image).select(self.band).reduceRegion(**d).getInfo()
+                if image == mask_this_image:
+                    #print("Masking 2008 image")
+                    img = ee.Image(image).mask(image)
+                else:
+                    img = ee.Image(image)
+                response = img.select(self.band).reduceRegion(**d).getInfo()
                 if response['b1']:
                     response_dict[image_key + '_mean'] = '{0:6.2f}'.format(response['b1'])
                 else:
                     response_dict[image_key + '_mean'] = 'null'
             except ee.EEException:
-                print("Hit EEException with request")
+                #print("Hit EEException with request")
                 response_dict[image_key + '_mean'] = 'null'
         return response_dict
 
