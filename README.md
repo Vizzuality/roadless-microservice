@@ -2,7 +2,8 @@
 
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)]()
 
-A Microservice using Flask to identify stats around a point.
+A Microservice using Flask to identify statistics around a buffered point. Input data are time (in mins), from
+[travel time to major cities](http://forobs.jrc.ec.europa.eu/products/gam/).
 
 
 
@@ -36,7 +37,7 @@ $ curl -i -H "Content-Type: application/json" -X POST -d '{"lat":28.5, "lon":16.
 ```
 
 ### Halting the microservice
-If the process is unresponsive obtain the docker ID, and use `docker stop <ID>` to end the process. E.g:
+If the process is unresponsive to closing with `ctl + c`, obtain the docker ID and use `docker stop <ID>` to end the process. E.g:
 
 ```bash
 $docker ps
