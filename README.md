@@ -7,23 +7,32 @@ A Microservice using Flask to identify statistics around a buffered point. Input
 
 
 
-### Docker: starting the Microservice
-To run the Flask microservice
+### Starting the Microservice
+To run the Flask microservice:
+1. Pull this repo, and `cd` to the folder.
 1. Ensure Docker is installed.
-1. Ensuring the .env file is present containing the EE_PRIVATE_KEY and EE_USER environment variables,
-1. `$chmod +x start.sh`
-1. `$./start.sh`
+1. Ensure the .env file is present contains the EE_PRIVATE_KEY and EE_USER environment variables.
+1. Ensure the `start.sh` script can be executed (`chmod +x start.sh`).
+1. Execute the start script with a flag indicating if this is a development or production environment, or a test: e.g.
+   - `./start.sh test`
+   - `./start.sh develop`
+   - `./start.sh depoly`
+  
+At this point, the microservice should be accessible on localhost:8000.
 
-At this point, the microservice should be active on localhost:8000.
+Note: If a development server is started, the app is ultimatley executed with a `python main.py` command,
+running the Flask app in development mode. However, if a deoply server is started, the app is executed with
+[Gunicorn](http://gunicorn.org/#docs), using the settings in `gunicorn.py`.
 
+Tests run using py.test.
 
 ### Using the Microservice
 
- POST request and response:
+The app accepts POST requests, expecting values for `lat`, `lon` (both floats, of decimal degrees), and `z` (an integer
+from 1-12). It gives a json-like response:
 
 ```bash
 $ curl -i -H "Content-Type: application/json" -X POST -d '{"lat":28.5, "lon":16.3, "z":3}' http://localhost:5000/api/click-point-data/
-
 {
   "task": {
     "b1_count": 32,
@@ -43,51 +52,5 @@ If the process is unresponsive to closing with `ctl + c`, obtain the docker ID a
 $docker ps
 CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS              PORTS                    NAMES
 3ad44399b2be        flask_app           "./entrypoint.sh"   About a minute ago   Up About a minute   0.0.0.0:8000->5000/tcp   kind_elion
-
 $docker stop 3ad44399b2be
-```
-
-### Extended Notes
-
-
-Python 2.7 app built using Flask, and python-earth-engine-api.
-
-1. Install the requirements via pip
-
-```
-pip install -r requirements.txt
-```
-
-2. start the app
-
-```bash
-$python main.py
-```
-
-2. Send a POST request with lat, lon, and z information: e.g. to /api/click-point-data/
-
-```
-$ curl -i -H "Content-Type: application/json" -X POST -d '{"lat":28.5, "lon":16.3, "z":3}' http://localhost:5000/api/click-point-data/
-````
-
-Example response...
-
-```
-curl -i -H "Content-Type: application/json" -X POST -d '{"lat":28.5, "lon":16.3, "z":3}' http://localhost:5000/api/click-point-data/
-HTTP/1.0 201 CREATED
-Content-Type: application/json
-Content-Length: 181
-Server: Werkzeug/0.11.15 Python/2.7.12
-Date: Fri, 03 Feb 2017 13:31:14 GMT
-
-{
-  "task": {
-    "tavg_count": 32,
-    "tavg_max": 207.0,
-    "tavg_mean": 206.75,
-    "tavg_min": 206.0,
-    "tavg_stdDev": 0.43994134506405985,
-    "tavg_sum": 6616.0
-  }
-}
 ```

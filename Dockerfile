@@ -19,6 +19,7 @@ COPY requirements.txt /opt/$NAME/requirements.txt
 RUN cd /opt/$NAME && pip install -r requirements.txt
 
 COPY main.py /opt/$NAME/main.py
+COPY gunicorn.py /opt/$NAME/gunicorn.py
 COPY entrypoint.sh /opt/$NAME/entrypoint.sh
 
 # Copy the application folder inside the container
@@ -33,3 +34,4 @@ EXPOSE 5000
 
 # Launch script
 ENTRYPOINT ["./entrypoint.sh"]
+#CMD [echo, "Excecuted echo in dockerfile"]
