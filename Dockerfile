@@ -29,7 +29,7 @@ RUN chmod +x /opt/$NAME/entrypoint.sh
 
 # Tell Docker we are going to use this port
 EXPOSE 5000
-USER $USER
+# USER $USER
 
 # Launch script
 ENTRYPOINT ["./entrypoint.sh"]
