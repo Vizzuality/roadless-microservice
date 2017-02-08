@@ -19,6 +19,7 @@ COPY requirements.txt /opt/$NAME/requirements.txt
 RUN cd /opt/$NAME && pip install -r requirements.txt
 
 COPY main.py /opt/$NAME/main.py
+COPY gunicorn.py /opt/$NAME/gunicorn.py
 COPY entrypoint.sh /opt/$NAME/entrypoint.sh
 
 # Copy the application folder inside the container
@@ -29,7 +30,8 @@ RUN chmod +x /opt/$NAME/entrypoint.sh
 
 # Tell Docker we are going to use this port
 EXPOSE 5000
-USER $USER
+# USER $USER
 
 # Launch script
 ENTRYPOINT ["./entrypoint.sh"]
+#CMD [echo, "Excecuted echo in dockerfile"]
