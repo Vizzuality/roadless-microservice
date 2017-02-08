@@ -13,7 +13,8 @@ To run the Flask microservice:
 1. Ensure Docker is installed.
 1. Ensure the .env file is present contains the EE_PRIVATE_KEY and EE_USER environment variables.
 1. Ensure the `start.sh` script can be executed (`chmod +x start.sh`).
-1. Execute the start script with a flag indicating if this is a development or production environment: e.g.
+1. Execute the start script with a flag indicating if this is a development or production environment, or a test: e.g.
+   - `./start.sh test`
    - `./start.sh develop`
    - `./start.sh depoly`
   
@@ -23,6 +24,7 @@ Note: If a development server is started, the app is ultimatley executed with a 
 running the Flask app in development mode. However, if a deoply server is started, the app is executed with
 [Gunicorn](http://gunicorn.org/#docs), using the settings in `gunicorn.py`.
 
+Tests run using py.test.
 
 ### Using the Microservice
 
