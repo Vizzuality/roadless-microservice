@@ -2,8 +2,6 @@ production:
   build: .
   ports:
     - "8000:5000"
-  volumes:
-    - .:/opt/flask_app/
   env_file:
     - .env
   command: production

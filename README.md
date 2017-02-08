@@ -16,8 +16,8 @@ To run the Flask microservice:
 1. Execute the start script with a flag indicating if this is a development or production environment, or a test: e.g.
    - `./start.sh test`
    - `./start.sh develop`
-   - `./start.sh depoly`
-  
+   - `./start.sh production`
+
 At this point, the microservice should be accessible on localhost:8000.
 
 Note: If a development server is started, the app is ultimatley executed with a `python main.py` command,
