@@ -8,7 +8,9 @@ case "$1" in
         exec python main.py
         ;;
     test)
-        echo "Test (not yet)"
+        echo "Running Tests"
+        echo -e "$EE_PRIVATE_KEY" | base64 -d > privatekey.pem
+        exec py.test -v
         ;;
     production)
         echo "Running Production Server"

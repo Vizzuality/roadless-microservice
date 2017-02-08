@@ -1,27 +1,24 @@
-from flask_testing import TestCase
-import requests
-import urllib2
-from main import app
-#
-# Curerntly, started working on tests - not functional yet
+from __future__ import print_function, division
+from main import ClickPointData
+import sys
+import ee
+import os
 
-class MyTest(TestCase):
-    def create_app(self):
-        app.config['TESTING'] = True
-        return app
+if sys.platform == 'darwin':
+    local_system = True
+    # If using a local mac, assume you can initilise using the below...
+    ee.Initialize()
+else:
+    # Else, assume you have an EE_private_key environment variable with authorisation,
+    service_account = os.environ['EE_USER']
+    print(service_account)
+    credentials = ee.ServiceAccountCredentials(service_account, './privatekey.pem')
+    ee.Initialize(credentials, 'https://earthengine.googleapis.com')
 
-class TestViews(MyTest):
+# Going to test the functionality of the app directly via the return_ee_stats method
 
-    # def test_post(self):
-    #     r = requests.post('http://localhost:5001/api/click-point-data/', data={'lat':10, 'lon':10, 'z':3}).json()
-    #     print(r)
-    #     return
-
-    # def test_get(self):
-    #     response = self.client.get("/api/click-point-data/", data={'lat':10, 'lon':10, 'z':3})
-    #     print("RESPONSE WAS: ", response)
-    #     return
-
-    # def test_flask_application_is_up_and_running(self):
-    #     response = urllib2.urlopen(self.get_server_url())
-    #     self.assertEqual(response.code, 200)
+def test_basic_response():
+    r = ClickPointData().return_ee_stats({'lon': 10, 'lat': 10, 'z': 1})
+    print("Returned ", r)
+    assert isinstance(r, dict)
+    return

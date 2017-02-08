@@ -4,7 +4,7 @@ case "$1" in
         docker-compose -f docker-compose-develop.yml build && docker-compose -f docker-compose-develop.yml up
         ;;
     test)
-        echo "Test (not yet)"
+        docker-compose -f docker-compose-test.yml build && docker-compose -f docker-compose-test.yml up
         ;;
     production)
         docker-compose -f docker-compose.yml build && docker-compose -f docker-compose.yml up
