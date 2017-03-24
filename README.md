@@ -44,6 +44,11 @@ The app accepts POST requests, expecting values for `lat`, `lon` (both floats, o
 
 ```bash
 $ curl -i -H "Content-Type: application/json" -X POST -d '{"lat":28.5, "lon":16.3, "z":3}' http://localhost:5000/api/click-point-data/
+```
+
+A possible response would look like:
+
+```json
 {
   "task": {
     "b1_count": 32,
@@ -70,6 +75,7 @@ $docker stop 3ad44399b2be
 The `.env.sample` file contains a template of the required environment variables.
 Create a new file called `.env` following the template:
 
-* **EE_PRIVATE_KEY** = Earth Engine Private Key credentials
-* **EE_USER** = Earth Engine developer service account
+* **EE_CREDENTIAL_STORE** = "local" if the local environment of the application has preconfigured access to Earth Engine. 
+* **EE_PRIVATE_KEY** = Earth Engine Private Key credentials. Only used if 'EE_CREDENTIAL_STORE' is not local 
+* **EE_USER** = Earth Engine developer service account. Only used if 'EE_CREDENTIAL_STORE' is not local
 * **DEBUG** = boolean, to indicate whether or not to run in debug mode.

@@ -4,22 +4,28 @@ import flask_restful
 import sys
 import os
 import ee
+from dotenv.main import load_dotenv
+from flask.ext.cors import CORS
+
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(dotenv_path)
 
 app = flask.Flask(__name__)
 api = flask_restful.Api(app)
+cors = CORS(app)
 
 print("Starting Flask Microservice. Running on ", sys.platform)
 local_system = False
-if sys.platform == 'darwin':
+if os.environ['EE_CREDENTIAL_STORE'] == 'local':
     local_system = True
-    # If using a local mac, assume you can initilise using the below...
     ee.Initialize()
 else:
     # Else, assume you have an EE_private_key environment variable with authorisation,
     service_account = os.environ['EE_USER']
     print(service_account)
-    credentials = ee.ServiceAccountCredentials(service_account, './privatekey.pem')
+    credentials = ee.ServiceAccountCredentials(service_account, os.path.join(os.path.dirname(__file__), './privatekey.pem'))
     ee.Initialize(credentials, 'https://earthengine.googleapis.com')
+
 
 class ClickPointData(flask_restful.Resource):
     def __init__(self):
@@ -35,7 +41,7 @@ class ClickPointData(flask_restful.Resource):
         location = flask.request.get_json(force=True)
         self.check_request_params(location)
         ee_stats = self.return_ee_stats(location)
-        #print("Got {0}".format(ee_stats))
+        # print("Got {0}".format(ee_stats))
         return ee_stats
 
     def check_request_params(self, request):
@@ -63,11 +69,11 @@ class ClickPointData(flask_restful.Resource):
         d = {'bestEffort': True, 'geometry': self.eePoint(location), 'reducer': ee.Reducer.mean()}
         for image in self.imageIDs:
             image_key = image.split('/')[-1][-4:]
-            #print("Requesting EE data for {0}".format(image_key))
+            # print("Requesting EE data for {0}".format(image_key))
             # print("Set buffer distance of ", self.z_dic[location['z']])
             try:
                 if image == mask_this_image:
-                    #print("Masking 2008 image")
+                    # print("Masking 2008 image")
                     img = ee.Image(image).mask(image)
                 else:
                     img = ee.Image(image)
@@ -77,7 +83,7 @@ class ClickPointData(flask_restful.Resource):
                 else:
                     response_dict[image_key + '_mean'] = 'null'
             except ee.EEException:
-                #print("Hit EEException with request")
+                # print("Hit EEException with request")
                 response_dict[image_key + '_mean'] = 'null'
         return response_dict
 
@@ -87,7 +93,4 @@ api.add_resource(ClickPointData, '/api/click-point-data/')
 
 # This is only used when running locally. When running live, Gunicorn runs the application.
 if __name__ == "__main__":
-    if sys.platform == 'darwin':
-        app.run(host='0.0.0.0', debug=os.getenv('DEBUG') == 'True')
-    else:
-        app.run(host='0.0.0.0', debug=os.getenv('DEBUG') == 'False')
+    app.run(host='0.0.0.0', debug=os.getenv('DEBUG') == 'True')
