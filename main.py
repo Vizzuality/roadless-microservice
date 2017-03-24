@@ -5,7 +5,7 @@ import sys
 import os
 import ee
 from dotenv.main import load_dotenv
-from flask.ext.cors import CORS
+from flask_cors import CORS
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 load_dotenv(dotenv_path)
