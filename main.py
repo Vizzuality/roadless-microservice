@@ -32,9 +32,17 @@ class ClickPointData(flask_restful.Resource):
         self.params = ['lat', 'lon', 'z']
         # Hacky way of ensuring the area of polygon does not become too small to function as a reducer
         self.z_dic = [156412, 78206, 3910, 19551, 9776, 4888, 7000, 7000, 7000, 7000, 7000, 7000, 7000]
-        self.imageIDs = ['users/malariaatlasproject/accessibilityMap/jrc_accesibility2008',
-                       'users/malariaatlasproject/accessibilityMap/jrc_accessibility2017']
-        self.band = 'b1'
+        self.imageIDs = [
+            {
+                'id': 'users/malariaatlasproject/accessibilityMap/jrc_accesibility2008',
+                'year': '2008',
+                'band': 'b1'
+            },{
+                'id': 'Oxford/MAP/accessibility_to_cities_2015_v1_0',
+                'year': '2017',
+                'band': 'accessibility'
+            }
+        ]
         return
 
     def post(self):
@@ -68,23 +76,25 @@ class ClickPointData(flask_restful.Resource):
         response_dict = {}
         d = {'bestEffort': True, 'geometry': self.eePoint(location), 'reducer': ee.Reducer.mean()}
         for image in self.imageIDs:
-            image_key = image.split('/')[-1][-4:]
-            # print("Requesting EE data for {0}".format(image_key))
+            image_key = image.get('id').split('/')[-1][-4:]
+            #print("Requesting EE data for {0}".format(image_key))
             # print("Set buffer distance of ", self.z_dic[location['z']])
             try:
-                if image == mask_this_image:
-                    # print("Masking 2008 image")
-                    img = ee.Image(image).mask(image)
+                if image.get('id') == mask_this_image:
+                    #print("Masking 2008 image")
+                    img = ee.Image(image.get('id')).mask(image.get('id'))
                 else:
-                    img = ee.Image(image)
-                response = img.select(self.band).reduceRegion(**d).getInfo()
-                if response['b1']:
-                    response_dict[image_key + '_mean'] = '{0:6.2f}'.format(response['b1'])
+                    img = ee.Image(image.get('id'))
+
+                response = img.select(image.get('band')).reduceRegion(**d).getInfo()
+
+                if response[image.get('band')]:
+                    response_dict[image.get('year') + '_mean'] = '{0:6.2f}'.format(response[image.get('band')])
                 else:
-                    response_dict[image_key + '_mean'] = 'null'
+                    response_dict[image.get('year') + '_mean'] = 'null'
             except ee.EEException:
-                # print("Hit EEException with request")
-                response_dict[image_key + '_mean'] = 'null'
+                #print("Hit EEException with request")
+                response_dict[image.get('year') + '_mean'] = 'null'
         return response_dict
 
 
