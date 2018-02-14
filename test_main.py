@@ -1,22 +1,26 @@
 from __future__ import print_function, division
 from main import ClickPointData
-import sys
 import pytest
 import ee
 import os
+from dotenv.main import load_dotenv
 
-if sys.platform == 'darwin':
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(dotenv_path)
+
+if os.environ['EE_CREDENTIAL_STORE'] == 'local':
     local_system = True
-    # If using a local mac, assume you can initilise using the below...
+    # If using a local mac, assume you can initialise using the below...
     ee.Initialize()
 else:
     # Else, assume you have an EE_private_key environment variable with authorisation,
     service_account = os.environ['EE_USER']
     print(service_account)
-    credentials = ee.ServiceAccountCredentials(service_account, './privatekey.pem')
+    credentials = ee.ServiceAccountCredentials(service_account, os.path.join(os.path.dirname(__file__), './privatekey.pem'))
     ee.Initialize(credentials, 'https://earthengine.googleapis.com')
 
 # Going to test the functionality of the app directly via the return_ee_stats method
+
 
 def test_basic_response_zoomed():
     expected = {'2017_mean': '  3.98', '2008_mean': '  6.02'}
@@ -26,12 +30,14 @@ def test_basic_response_zoomed():
     assert r == expected, "Returned dictionary {r} incorrect".format(r=r)
     return
 
+
 def test_basic_response_distant():
     expected = {'2017_mean': ' 71.08', '2008_mean': '106.74'}
     d = {'lon': -16.3, 'lat': 28.5, 'z': 0}
     r = ClickPointData().return_ee_stats(d)
     assert r == expected, "Returned dictionary {r} incorrect".format(r=r)
     return
+
 
 def test_point_distant():
     """Check a buffered area was within 10% of the expected size for distant zoom level"""
